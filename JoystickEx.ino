@@ -53,7 +53,8 @@ enum Mode {
     MODE_BESIEGE = 1,
     MODE_DIRT = 2,
     MODE_RAIL = 3,
-    MODE_MOUSE = 4,
+    MODE_OSU = 4,
+    MODE_MOUSE = 5,
     MODE_CHOICE = 7
 };
 static Mode mode = MODE_MOUSE;
@@ -199,6 +200,16 @@ void operate() {
             KEYBD('p', buttonsState[3]); KEYBD('/', buttonsState[7]);
             KEYBD(KEY_ESC, buttonsState[3] && buttonsState[7]);
             break;
+        case MODE_OSU:
+            KEYBD(KEY_UP_ARROW, joyLState[DEF_UP] || joyRState[DEF_UP]);
+            KEYBD(KEY_DOWN_ARROW, joyLState[DEF_DOWN] || joyRState[DEF_DOWN]);
+            KEYBD(KEY_LEFT_ARROW, joyLState[DEF_LEFT] || joyRState[DEF_LEFT]);
+            KEYBD(KEY_RIGHT_ARROW, joyLState[DEF_RIGHT] || joyRState[DEF_RIGHT]);
+            KEYBD('d', buttonsState[0]); KEYBD('s', buttonsState[4]);
+            KEYBD('f', buttonsState[1]); KEYBD(' ', buttonsState[5]);
+            KEYBD('j', buttonsState[2]); KEYBD(' ', buttonsState[6]);
+            KEYBD('k', buttonsState[3]); KEYBD('l', buttonsState[7]);
+            KEYBD(KEY_ESC, buttonsState[3] && buttonsState[7]);
         case MODE_MOUSE:
             if (joyLState[DEF_UP]) Mouse.move(0, -1, 0);
             if (joyLState[DEF_DOWN]) Mouse.move(0, 1, 0);
