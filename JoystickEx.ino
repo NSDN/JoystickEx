@@ -1,6 +1,8 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 
+#include <vector>
+
 static uint8_t buttons[] = {
     A0, A1, A2, A3, A4, A5, A6, A7
 };
@@ -28,6 +30,23 @@ static bool ledRState[3];
 #define ledROFF(v) ledRState[v] = false; digitalWrite(ledR[v], !ledRState[v]);
 #define ledLBIK(v) ledLState[v] = !ledLState[v]; digitalWrite(ledL[v], !ledLState[v]);
 #define ledRBIK(v) ledRState[v] = !ledRState[v]; digitalWrite(ledR[v], !ledRState[v]);
+
+static std::vector<uint8_t> tmpState(16);
+void keybdPress(uint8_t v) {
+    for (uint8_t i = 0; i < tmpState.size(); i++) {
+        if (tmpState[i] == v) return;
+    }
+    tmpState.push_back(v);
+    Keyboard.press(v);
+}
+void keybdRelease(uint8_t v) {
+    for (uint8_t i = 0; i < tmpState.size(); i++) {
+        if (tmpState[i] == v) {
+            tmpState.erase(tmpState.begin() + i);
+            Keyboard.release(v);
+        }
+    }
+}
 
 enum Mode {
     MODE_TOUHOU = 0,
@@ -120,7 +139,7 @@ void sniff() {
 }
 
 void operate() {
-    #define KEYBD(v, s) if (s) Keyboard.press(v); else Keyboard.release(v);
+    #define KEYBD(v, s) if (s) keybdPress(v); else keybdRelease(v);
     #define MOUSE(v, s) if (s && !Mouse.isPressed(v)) Mouse.press(v); else if (!s && Mouse.isPressed(v)) Mouse.release(v);
 
     switch (mode) {
@@ -174,7 +193,7 @@ void operate() {
             KEYBD('a', joyRState[DEF_DOWN]);
             KEYBD(';', joyRState[DEF_LEFT]);
             KEYBD('\'', joyRState[DEF_RIGHT]);
-            KEYBD('q', buttonsState[0]); KEYBD('e', buttonsState[4]);
+            KEYBD('x', buttonsState[0]); KEYBD('b', buttonsState[4]);
             KEYBD('h', buttonsState[1]); KEYBD('l', buttonsState[5]);
             KEYBD('[', buttonsState[2]); KEYBD(']', buttonsState[6]);
             KEYBD('p', buttonsState[3]); KEYBD('/', buttonsState[7]);
@@ -210,6 +229,7 @@ void loop() {
     operate();
 
     if (mode == MODE_CHOICE) {
+        tmpState.clear();
         scan();
         for (i = 0; i < 8; i++) {
             if (buttonsState[i]) {
