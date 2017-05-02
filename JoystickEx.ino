@@ -210,6 +210,7 @@ void operate() {
             KEYBD('j', buttonsState[2]); KEYBD(' ', buttonsState[6]);
             KEYBD('k', buttonsState[3]); KEYBD('l', buttonsState[7]);
             KEYBD(KEY_ESC, buttonsState[3] && buttonsState[7]);
+            break;
         case MODE_MOUSE:
             if (joyLState[DEF_UP]) Mouse.move(0, -1, 0);
             if (joyLState[DEF_DOWN]) Mouse.move(0, 1, 0);
