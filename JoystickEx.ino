@@ -31,7 +31,7 @@ static bool ledRState[3];
 #define ledLBIK(v) ledLState[v] = !ledLState[v]; digitalWrite(ledL[v], !ledLState[v]);
 #define ledRBIK(v) ledRState[v] = !ledRState[v]; digitalWrite(ledR[v], !ledRState[v]);
 
-static std::vector<uint8_t> tmpState(16);
+static std::vector<uint8_t> tmpState(32);
 void keybdPress(uint8_t v) {
     for (uint8_t i = 0; i < tmpState.size(); i++) {
         if (tmpState[i] == v) return;
@@ -58,6 +58,18 @@ enum Mode {
     MODE_CHOICE = 7
 };
 static Mode mode = MODE_MOUSE;
+
+enum Stall {
+    DIRT_R = 0,
+    DIRT_0 = 1,
+    DIRT_1 = 2,
+    DIRT_2 = 3,
+    DIRT_3 = 4,
+    DIRT_4 = 5,
+    DIRT_5 = 6,
+    DIRT_6 = 7
+};
+static Stall dirtStall = DIRT_0;
 
 void setup() {
     uint8_t i;
@@ -109,6 +121,9 @@ void sniff() {
         buttonsState[4] && buttonsState[7]
     ) {
         short count = 0;
+        Keyboard.releaseAll();
+        Mouse.release(MOUSE_LEFT);
+        Mouse.release(MOUSE_RIGHT);
         ledLOFF(DEF_G); ledROFF(DEF_G);
         while (
             joyLState[DEF_RIGHT] && joyRState[DEF_LEFT] &&
@@ -171,10 +186,29 @@ void operate() {
             KEYBD(' ', buttonsState[3] && buttonsState[7]);
             break;
         case MODE_DIRT:
+            if (joyLState[DEF_LEFT]) {
+                delay(20);
+                while (joyLState[DEF_LEFT]) {
+                    scan(); delay(20);
+                }
+                dirtStall = ((dirtStall > DIRT_R) ? (Stall)(dirtStall - 1) : DIRT_R);
+            }
+            if (joyLState[DEF_RIGHT]) {
+                delay(20);
+                while (joyLState[DEF_RIGHT]) {
+                    scan(); delay(20);
+                }
+                dirtStall = ((dirtStall < DIRT_6) ? (Stall)(dirtStall + 1) : DIRT_6);
+            }
+            KEYBD('`', dirtStall == DIRT_R);
+            KEYBD('1', dirtStall == DIRT_1);
+            KEYBD('2', dirtStall == DIRT_2);
+            KEYBD('3', dirtStall == DIRT_3);
+            KEYBD('4', dirtStall == DIRT_4);
+            KEYBD('5', dirtStall == DIRT_5);
+            KEYBD('6', dirtStall == DIRT_6);
             KEYBD(KEY_UP_ARROW, joyLState[DEF_UP]);
             KEYBD(KEY_DOWN_ARROW, joyLState[DEF_DOWN]);
-            KEYBD(KEY_PAGE_DOWN, joyLState[DEF_LEFT]);
-            KEYBD(KEY_PAGE_UP, joyLState[DEF_RIGHT]);
             KEYBD(KEY_END, joyRState[DEF_UP]);
             KEYBD(' ', joyRState[DEF_DOWN]);
             KEYBD(KEY_LEFT_ARROW, joyRState[DEF_LEFT]);
