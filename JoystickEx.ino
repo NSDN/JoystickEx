@@ -231,7 +231,7 @@ void operate() {
             KEYBD('x', buttonsState[0]); KEYBD('b', buttonsState[4]);
             KEYBD('h', buttonsState[1]); KEYBD('l', buttonsState[5]);
             KEYBD('[', buttonsState[2]); KEYBD(']', buttonsState[6]);
-            KEYBD('p', buttonsState[3]); KEYBD('/', buttonsState[7]);
+            KEYBD('p', buttonsState[3]); KEYBD('g', buttonsState[7]);
             KEYBD(KEY_ESC, buttonsState[3] && buttonsState[7]);
             break;
         case MODE_OSU:
