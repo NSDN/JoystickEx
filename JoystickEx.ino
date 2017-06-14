@@ -12,16 +12,16 @@ static bool buttonsState[8];
 #define DEF_DOWN 1
 #define DEF_LEFT 2
 #define DEF_RIGHT 3
-static uint8_t joyL[] = { 52, 50 ,48, 46 };
-static uint8_t joyR[] = { 53, 51, 49, 47 };
+static uint8_t joyL[] = { 36, 34, 32, 30 };
+static uint8_t joyR[] = { 28, 26, 24, 22 };
 static bool joyLState[4];
 static bool joyRState[4];
 
 #define DEF_R 0
 #define DEF_G 1
 #define DEF_B 2
-static uint8_t ledL[] = { 44, 42, 40 };
-static uint8_t ledR[] = { 45, 43, 41 };
+static uint8_t ledL[] = { 21, 20, 19 };
+static uint8_t ledR[] = { 18, 17, 16 };
 static bool ledLState[3];
 static bool ledRState[3];
 #define ledLON(v) ledLState[v] = true; digitalWrite(ledL[v], !ledLState[v]);
@@ -72,14 +72,17 @@ enum Stall {
 static Stall dirtStall = DIRT_0;
 
 void setup() {
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, LOW);
+    
     uint8_t i;
     for (i = 0; i < 8; i++) {
-        pinMode(buttons[i], INPUT_PULLUP);
+        pinMode(buttons[i], INPUT);
         buttonsState[i] = false;
     }
     for (i = 0; i < 4; i++) {
-        pinMode(joyL[i], INPUT_PULLUP);
-        pinMode(joyR[i], INPUT_PULLUP);
+        pinMode(joyL[i], INPUT);
+        pinMode(joyR[i], INPUT);
         joyLState[i] = false;
         joyRState[i] = false;
     }
@@ -99,6 +102,7 @@ void setup() {
 
     Mouse.begin();
     Keyboard.begin();
+    digitalWrite(LED_BUILTIN, HIGH);
 }
 
 void scan() {
@@ -189,14 +193,14 @@ void operate() {
             if (joyLState[DEF_LEFT]) {
                 delay(20);
                 while (joyLState[DEF_LEFT]) {
-                    scan(); delay(20);
+                    sniff(); delay(20);
                 }
                 dirtStall = ((dirtStall > DIRT_R) ? (Stall)(dirtStall - 1) : DIRT_R);
             }
             if (joyLState[DEF_RIGHT]) {
                 delay(20);
                 while (joyLState[DEF_RIGHT]) {
-                    scan(); delay(20);
+                    sniff(); delay(20);
                 }
                 dirtStall = ((dirtStall < DIRT_6) ? (Stall)(dirtStall + 1) : DIRT_6);
             }
