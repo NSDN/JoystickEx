@@ -7,6 +7,15 @@ static uint8_t buttons[] = {
     A0, A1, A2, A3, A4, A5, A6, A7
 };
 static bool buttonsState[8];
+static bool prevBtnState[8];
+void copyBtnState() {
+    for (uint8_t i = 0; i < 8; i++) {
+        prevBtnState[i] = buttonsState[i];
+    }
+}
+bool btnStateChanged(uint8_t v) {
+    return prevBtnState[v] ^ buttonsState[v];
+}
 
 #define DEF_UP 0
 #define DEF_DOWN 1
@@ -114,6 +123,7 @@ void scan() {
 }
 
 void sniff() {
+    copyBtnState();
     scan();
 
     if (
@@ -164,10 +174,10 @@ void operate() {
             KEYBD(KEY_DOWN_ARROW, joyLState[DEF_DOWN] || joyRState[DEF_DOWN]);
             KEYBD(KEY_LEFT_ARROW, joyLState[DEF_LEFT] || joyRState[DEF_LEFT]);
             KEYBD(KEY_RIGHT_ARROW, joyLState[DEF_RIGHT] || joyRState[DEF_RIGHT]);
-            KEYBD('a', buttonsState[0]); KEYBD('z', buttonsState[4]);
-            KEYBD('s', buttonsState[1]); KEYBD('x', buttonsState[5]);
-            KEYBD('d', buttonsState[2]); KEYBD('c', buttonsState[6]);
-            KEYBD('f', buttonsState[3]); KEYBD('v', buttonsState[7]);
+            KEYBD(KEY_LEFT_CTRL, buttonsState[0]); KEYBD(KEY_LEFT_SHIFT, buttonsState[4]);
+            KEYBD('a', buttonsState[1]); KEYBD('z', buttonsState[5]);
+            KEYBD('s', buttonsState[2]); KEYBD('x', buttonsState[6]);
+            KEYBD('d', buttonsState[3]); KEYBD('c', buttonsState[7]);  
             KEYBD(KEY_ESC, buttonsState[3] && buttonsState[7]);
             break;
         case MODE_BESIEGE:
